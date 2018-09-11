@@ -114,6 +114,7 @@ elif sys.argv[1]=='train':
 
     inSize = len(open('vocab.txt','rb').readlines())
 
+    # This set of parameters works successfully on the overfitting experiments
     nClasses = 2
     nHidden = 256
     # weights = torch.zeros(nClasses)
