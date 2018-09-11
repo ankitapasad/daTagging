@@ -10,7 +10,11 @@ plt.switch_backend('agg')
 import pdb
 import random
 
-random.seed(100)
+rSeed = 100
+random.seed(rSeed)
+torch.manual_seed(rSeed)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(rSeed)
 
 if sys.argv[1]=='dataproc':
     def getData(dataSplit='train',vocab=None,tag2label=None,tag2freq=None,thresh=2000):
@@ -114,7 +118,6 @@ elif sys.argv[1]=='train':
 
     inSize = len(open('vocab.txt','rb').readlines())
 
-    # This set of parameters works successfully on the overfitting experiments
     nClasses = 2
     nHidden = 256
     # weights = torch.zeros(nClasses)
@@ -144,7 +147,7 @@ elif sys.argv[1]=='train':
 
             return out
 
-    ff = Net(nClasses,inSize,nHidden,init=True).cuda()
+    ff = Net(nClasses,inSize,nHidden,init=False).cuda()
     # optimizer = optim.Adam(ff.parameters(),lr=0.005)
     # optimizer = optim.SGD(ff.parameters(),lr=0.1)
     optimizer = optim.Adagrad(ff.parameters(),lr=0.01)
@@ -201,6 +204,8 @@ elif sys.argv[1]=='train':
         devAcc.append(correct/float(total))
         devLoss.append(lossTot/float(total))
         iterNo += 1
+
+        ff.train()
 
     ff.eval()
     total = len(testData)
