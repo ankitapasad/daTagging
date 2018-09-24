@@ -9,14 +9,54 @@ import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import pdb
 import random
+from random import shuffle
+import argparse
+import copy
 
-rSeed = 100
+parser = argparse.ArgumentParser(description='DA tagging')
+parser.add_argument('--nEpoch', type=int, default=10,
+                    help='number of epochs')
+parser.add_argument('--rSeed', type=int, default=100,
+                    help='random seed')
+parser.add_argument('--nClasses', type=int, default=43,
+                    help='number of classes')
+parser.add_argument('--bSize', type=int, default=30,
+                    help='batch size')
+parser.add_argument('--nLayers', type=int, default=1,
+                    help='number of layers')
+parser.add_argument('--shuffle', type=bool, default=True,
+                    help='shuffling of data before each epoch')
+parser.add_argument('--init', type=bool, default=True,
+                    help='modified initialization or the default one')
+parser.add_argument('--lr', type=float, default=0.0015,
+                    help='initial learning rate')
+parser.add_argument('--optim', type=str, default='Adam',
+                    help='type of optimizer (SGD, Adagrad, Adam, RMSprop)')
+parser.add_argument('--initM', type=str, default='xavier_normal_',
+                    help='type of optimizer (xavier_uniform_,xavier_normal_,uniform_, \
+                    normal_,constant_,ones_,zeros_)')
+parser.add_argument('--mode', type=str, default='train',
+                    help='mode of operation (dataproc or train)')
+parser.add_argument('--nl', type=str, default='relu',
+                    help='non linearity (relu, sigmoid, tanh')
+parser.add_argument('--hiddenSize', type=int, default=256,
+                    help='number of hidden units')
+parser.add_argument('--lrs', type=float, default=1,
+                    help='learning rate scheduling')
+# for debugging purpose
+parser.add_argument('--overfit', type=bool, default=False,
+                    help='running an overfitting experiment')
+parser.add_argument('--debug', type=bool, default=False,
+                    help='printing outputs')
+args = parser.parse_args()
+
+rSeed = args.rSeed
 random.seed(rSeed)
 torch.manual_seed(rSeed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(rSeed)
 
-if sys.argv[1]=='dataproc':
+if args.mode=='dataproc':
     def getData(dataSplit='train',vocab=None,tag2label=None,tag2freq=None,thresh=2000):
         dataSize = 0
         dataList = open('dataSplit/fromPaper/dataset_'+dataSplit+'.txt').readlines()
@@ -48,17 +88,19 @@ if sys.argv[1]=='dataproc':
             index = [] # bag of words feature for this utterance
             words = line.split('\t')[1].split(' ') # list of words
             tag = line.split('\t')[2]
-            # if(tag=='statement' or tag=='backchannel'):
-            if(dataSplit=='train' and tag not in tag2label):
-                tag2label[tag] = labelId
-                labelId += 1
-                # labelWeights.append(tag2freq[tag])
-            labels.append(tag2label[tag])
-            for word in words:
-                try: index.append(vocab.index(word))
-                except: index.append(0) # for 'UNK'
-            indices.append(index)
-            dataSize += 1
+            if(tag=='statement' or tag=='backchannel'):
+            # if(tag=='statement'): pass 
+            # else:
+                if(dataSplit=='train' and tag not in tag2label):
+                    tag2label[tag] = labelId
+                    labelId += 1
+                    # labelWeights.append(tag2freq[tag])
+                labels.append(tag2label[tag])
+                for word in words:
+                    try: index.append(vocab.index(word))
+                    except: index.append(0) # for 'UNK'
+                indices.append(index)
+                dataSize += 1
 
         data = np.zeros([dataSize,len(vocab)])
         dataTensor = [None]*dataSize
@@ -93,25 +135,29 @@ if sys.argv[1]=='dataproc':
     testDataTensor, testLabels = getData('test',vocab,tag2label) 
     print(tag2label)
 
-    # print('Saving data')
-    # torch.save(trainDataTensor, 'trainData.pt')
-    # torch.save(trainLabels, 'trainLabels.pt')
+    print('Saving data')
+    torch.save(trainDataTensor, 'trainData.pt')
+    torch.save(trainLabels, 'trainLabels.pt')
 
-    # torch.save(devDataTensor, 'devData.pt')
-    # torch.save(devLabels, 'devLabels.pt')
+    torch.save(devDataTensor, 'devData.pt')
+    torch.save(devLabels, 'devLabels.pt')
 
-    # torch.save(testDataTensor, 'testData.pt')
-    # torch.save(testLabels, 'testLabels.pt')
+    torch.save(testDataTensor, 'testData.pt')
+    torch.save(testLabels, 'testLabels.pt')
 
 
-elif sys.argv[1]=='train':
+elif args.mode=='train':
+
     trainData = torch.load('trainData.pt')
     # pdb.set_trace()
     trainData = torch.stack(trainData)
     trainLabels = torch.load('trainLabels.pt')
+    batchSize = args.bSize
+    if(args.overfit):
     # debugging experimentation: overfits?
-    # trainData = trainData[:100]
-    # trainLabels = trainLabels[:100]
+        trainData = trainData[:100]
+        trainLabels = trainLabels[:100]
+        batchSize = 2
     devData = torch.stack(torch.load('devData.pt'))
     devLabels = torch.load('devLabels.pt')
     testData = torch.stack(torch.load('testData.pt'))
@@ -119,46 +165,53 @@ elif sys.argv[1]=='train':
 
     inSize = len(open('vocab.txt','rb').readlines())
 
-    nClasses = 43
-    nHidden = 256
+    nClasses = args.nClasses
+    nHidden = args.hiddenSize
+    nl = args.nl
+    initialization = args.init
     # weights = torch.zeros(nClasses)
     # weightFile = open('labelWeights.txt','r').readlines()
     # for i in range(len(weightFile)):
     #     weights[i] = (1-float(weightFile[i].strip('\n')))/(nClasses-1)
 
     class Net(nn.Module):
-        def __init__(self,nClasses,inputSize,hiddenSize,nLayers=1,init=False):
+        def __init__(self,nClasses,inputSize,hiddenSize,nLayers=1,nl='relu',init=False,initMethod='xavier_uniform_'):
             super(Net, self).__init__()
 
             # self.embed = nn.Embedding(inputSize,hiddenSize1)
+            self.nl = nl
             self.nLayers = nLayers
             self.affineIn = nn.Linear(inputSize,hiddenSize)
             self.affineOut = nn.Linear(hiddenSize,nClasses)
             self.hiddenLayers = nn.Sequential()
+            self.dropout = torch.nn.Dropout(p=0.25)
             for i in range(nLayers):
                 self.hiddenLayers.add_module('layer'+str(i), nn.Linear(hiddenSize, hiddenSize))
             if(init):
                 for m in self.modules():
                     if isinstance(m, nn.Linear):
-                        nn.init.xavier_normal_(m.weight, 1)
+                        # nn.init.xavier_normal_(m.weight, 1)
+                        getattr(nn.init,initMethod)(m.weight,1)
                         nn.init.constant_(m.bias, 0)
 
         def forward(self,x):
-            out = F.sigmoid(self.affineIn(x))
-            out = F.sigmoid(self.hiddenLayers.forward(out))
-            out = F.sigmoid(self.affineOut(out))
+            out = getattr(F, self.nl)(self.dropout(self.affineIn(x)))
+            out = getattr(F, self.nl)(self.hiddenLayers.forward(out))
+            out = getattr(F, self.nl)(self.affineOut(out))
 
             return out
 
-    ff = Net(nClasses,inSize,nHidden,nLayers=1,init=False).cuda()
-    # optimizer = optim.Adam(ff.parameters(),lr=0.01)
+    lrs = args.lrs
+    lr = args.lr
+    ff = Net(nClasses,inSize,nHidden,nLayers=args.nLayers,nl=nl,init=initialization,initMethod=args.initM).cuda()
+    # optimizer = getattr(optim, args.optim)(ff.parameters(),lr=lr)
     # optimizer = optim.SGD(ff.parameters(),lr=0.1)
-    optimizer = optim.Adagrad(ff.parameters(),lr=0.01)
+    # optimizer = optim.Adagrad(ff.parameters(),lr=0.01)
     criterion = torch.nn.CrossEntropyLoss(size_average=False).cuda()
 
-    nEpoch = 10
+    nEpoch = args.nEpoch
     iterNo = 0
-    batchSize = 30
+    shuffle = args.shuffle
     trainLoss = []
     devLoss = []
     trainAcc = []
@@ -184,21 +237,33 @@ elif sys.argv[1]=='train':
 
 
     ff.train()
-    print(ff.affineIn.weight)
+    # print(ff.affineIn.weight)
     while(iterNo<nEpoch):
         print("Epoch no: ", iterNo)
         # print(ff.training)
         # total = len(trainData)
+        # print(trainData[0:batchSize])
+        optimizer = getattr(optim, args.optim)(ff.parameters(),lr=lr)
+        lr = lr*lrs
+        if(shuffle):
+            temp = list(zip(trainData,trainLabels))
+            random.shuffle(temp)
+            [trainData1,trainLabels1] = zip(*temp)
+            trainData1 = torch.stack(trainData1)
+        else:
+            trainData1 = copy.deepcopy(trainData)
+            trainLabels1 = copy.deepcopy(trainLabels)
+        # print(trainData1[0:batchSize])
         total = 0
         correct = 0
         lossTot = 0
-        nBatches = len(trainData)//batchSize
+        nBatches = len(trainData1)//batchSize
         startIdx = 0
         for batchIdx in range(nBatches):
             optimizer.zero_grad()
             total += batchSize
             start, end = batchIdx*batchSize, (batchIdx+1)*batchSize
-            data, target = trainData[start:end].cuda(), torch.tensor(trainLabels[start:end]).cuda()
+            data, target = trainData1[start:end].cuda(), torch.tensor(trainLabels1[start:end]).cuda()
             # input = trainData[i]
             output = ff(data)
             output = output.view(batchSize,nClasses)
@@ -216,7 +281,9 @@ elif sys.argv[1]=='train':
                 # print(np.count_nonzero(list(ff.parameters())[0].grad.detach().cpu().numpy()))
                 print("Train acc: ", correct/float(total))
                 # print(ff.affineIn.weights.grad)
-                # print(pred)
+                if(args.debug):
+                    print(target)
+                    print(pred)
                 weightNormDiff.append(np.sqrt(np.sum((ff.affineIn.weight.detach().cpu().numpy() - prevStepWeight)**2)))
                 prevStepWeight = ff.affineIn.weight.detach().cpu().numpy()
                 trainAcc.append(correct/float(total))
