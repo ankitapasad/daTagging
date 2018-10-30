@@ -1,6 +1,6 @@
 There experiments are set up to understand the role of context vs the role of prosody when predicting the dialog act. 
 # Creating the data #
-bash humanSubjectEval.sh <no-files> <br />
+bash humanSubjectEval.sh `<no-files>` <br />
 <br />
 This will create csv files for the utterance transcripts and audio files for utterance segments. The corresponding ground truth labels are also stored in a csv file. All the dataset is generated for sorted version and shuffled version of the utterances from the files. For the shuffled version, all the utterances from all the given files are shuffled . 
 
@@ -15,6 +15,7 @@ Opinion statement; viewpoint, from personal opinions to proposed general facts  
 4. yn_q <br />
 These are the yes-no questions - not declarative.
 5. close <br />
+Conventional closing
 6. wh_q <br />
 These are the wh-questions - not open ended or declarative.
 7. agree <br />
