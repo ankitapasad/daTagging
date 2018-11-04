@@ -13,16 +13,23 @@ Opinion statement; viewpoint, from personal opinions to proposed general facts  
 3. backchannel <br />
 Continuers in a conversation. Includes backchannel placed in the form of questions as well.
 4. ynq <br />
-Yes-no questions, including the tag questions.
-5. question <br />
-Questions (which are not yes-no questions), could be open ended or declarative
-6. apprec <br />
-A backchannel/continuer which functions to express slightly more emotional involvement and support than just "uh-huh". An example transcript clip - 
+Yes-no questions, including the tag questions. 
 
 utt_id        | transcript        | label
 ------------- | ----------------- | -------------
-sw2027_A_175     | but you know I mean it was just completely miserable for her           | *statement*
-sw2027_B_176     | Yeah              | *backchannel*
+sw3411_A_75     | So you say you 've always have preferred General Motors products | *ynq*
+sw3411_B_76    | Yeah              | other
+sw2027_B_177     | I do  | statement
+
+5. question <br />
+Questions (which are not yes-no questions), could be open ended or declarative
+6. apprec <br />
+A backchannel/continuer which functions to express slightly more emotional involvement and support than just "uh-huh". 
+
+utt_id        | transcript        | label
+------------- | ----------------- | -------------
+sw2027_A_175     | but you know I mean it was just completely miserable for her  | statement
+sw2027_B_176     | Yeah              | backchannel
 sw2027_B_177     | that 's terrible  | *apprec*
 
 7. other <br />
