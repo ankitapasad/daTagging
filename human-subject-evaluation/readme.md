@@ -18,14 +18,6 @@ sw3408_A_47     | *is uh look for at the student to faculty ratio you know* | *s
 sw3408_A_48    | if you 're going to go to a college where student faculty ratio is three and four hundred to one I do n't think you 're going to have as meaningful of a college experience as if you 're down to the thirty to forty to one | opinion
 sw3408_B_49    | Uh-huh  | backchannel
 
-
-sw3408_B_44	So what is your advice to	wh_q	87.920125	89.397125
-sw3408_B_45	picking a college	wh_q	91.290625	92.072750
-sw3408_A_46	My advice is	statement	90.814750	91.878125
-sw3408_A_47	is uh look for at the student to faculty ratio you know	statement	92.563625	98.442875
-sw3408_A_48	if you 're going to go to a college where student faculty ratio is three and four hundred to one I do n't think you 're going to have as meaningful of a college experience as if you 're down to the thirty to forty to one	opinion	98.442875	111.123875
-sw3408_B_49	Uh-huh	backchannel	111.480875	112.058125
-
 2. opinion <br />
 Opinion statement; viewpoint, from personal opinions to proposed general facts  (listener could have basis to dispute)
 
@@ -99,3 +91,13 @@ sw2027_B_177     | *that 's terrible*  | *apprec*
 
 7. other <br />
 Anything that does not fit into one of the above classes should be marked as 'other'. 
+
+utt_id        | transcript        | label        | actual label
+------------- | ----------------- | -------------|----------------
+sw3408_B_113     | and I took tons of classes that I did n't need to | statement
+sw3408_B_114    | *and um I do n't know* | *other* | hedge
+sw3408_B_115    | I just feel like I 'm it 's it 's going to take me a lot longer than  | opinion
+sw3408_B_116     | and not that 's always bad | opinion
+sw3408_B_117    | *but it 's* | *other* | abandon
+sw3408_B_118    | *I do n't know*  | *other* | hedge
+sw3408_B_119    | it 's frustrating I gues  | opinion
