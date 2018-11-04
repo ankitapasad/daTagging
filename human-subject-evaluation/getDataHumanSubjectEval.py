@@ -1,5 +1,19 @@
 '''
-reference: https://github.com/Jonbean/switchboard_parse/blob/master/parsing_all.py
+This script generates dataset for human-subject evaluation experiments
+Dialog acts clubbed:
+statement 
+backchannel: bachchannel, acknowledge, backchannel_q
+opinion
+# agree: agree, yes # remove this since we do not have a separate class for "no"
+ynq: yn_q, yn_decl_q, tag_q
+# close # remove this since we are not involvong 'open' and this doesn't 
+        # fit well with other tags in the list
+q: wh_q, open_q, decl_q # questions which expect an answer
+apprec
+other: other, abandon, uninterp, no, hedge, excluded, quote, sum, affirm, directive, 
+       repeat, completion, hold, reject, neg, answer, repeat_q, open, ans_dispref,
+       or, commit, maybe, agree, yes, third_pty, self_talk, apology, downplay, thank,
+       rhet_q, close
 '''
 
 import xml.etree.ElementTree as ET
@@ -68,7 +82,7 @@ if __name__=="__main__":
 		sortedGTFile = open(startDir+'sortedGT.csv',"w")
 		shuffledGTFile = open(startDir+'shuffledGT.csv',"w")
 
-		truncDAs = ['statement','backchannel','opinion','yn_q','close','wh_q','agree','apprec','acknowledge','yes']
+		truncDAs = ['statement','backchannel','acknowledge','backchannel_q','opinion','yn_q','yn_decl_q','tag_q','wh_q','open_q','decl_q','apprec']
 		idDict = getDict.labelToId(truncDAs)
 		sortedLabels =[]
 		sortedUtt = []
