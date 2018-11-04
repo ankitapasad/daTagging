@@ -100,4 +100,12 @@ sw3408_B_115    | I just feel like I 'm it 's it 's going to take me a lot longe
 sw3408_B_116     | and not that 's always bad | opinion
 sw3408_B_117    | *but it 's* | *other* | abandon
 sw3408_B_118    | *I do n't know*  | *other* | hedge
-sw3408_B_119    | it 's frustrating I gues  | opinion
+sw3408_B_119    | it 's frustrating I guess  | opinion
+
+utt_id        | transcript        | label        | actual label
+------------- | ----------------- | -------------|----------------
+sw3409_B_77     | to be honest with you | statement
+sw3409_A_78    | Yeah | backchannel
+sw3409_A_79    | Yeah  | backchannel
+sw3409_A_80     |it 's it 's just too easy basically uh just get yourself in trouble with those | opinion
+sw3409_B_81    | Yeah | *other* | agree
