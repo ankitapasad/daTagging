@@ -10,6 +10,7 @@ Each utterance (audio/transcript) has to be labelled into one of the following 9
 A non-opinion statement; descriptive and/or narrative (listener has no basis to dispute)
 2. opinion <br />
 Opinion statement; viewpoint, from personal opinions to proposed general facts  (listener could have basis to dispute)
+
 utt_id        | transcript        | label
 ------------- | ----------------- | -------------
 sw3408_A_28     | You know I read a study once | statement
@@ -36,6 +37,7 @@ sw3411_B_76    | Yeah              | other
 sw2027_B_177     | I do  | statement
 
 This is an example transcript clip with a tag question
+
 utt_id        | transcript        | label
 ------------- | ----------------- | -------------
 sw4171_B_102     | *all that stuff huh* | *ynq*
