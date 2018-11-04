@@ -1,4 +1,4 @@
-There experiments are set up to understand the role of context vs the role of prosody when predicting the dialog act. 
+These experiments are set up to understand the role of context vs the role of prosody when predicting the dialog act. 
 # Creating the data #
 bash humanSubjectEval.sh `<no-files>` <br />
 <br />
