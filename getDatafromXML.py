@@ -11,8 +11,8 @@ def labelToId(truncDAs): # all distinct da in trunckDAs
 	idNo = 0
 	for label in truncDAs:
 		if(label=='yn_q' or label=='yn_decl_q' or label=='tag_q'): label = 'ynq'
-    	elif(label=='acknowledge' or label=='backchannel_q'): label = 'backchannel'
-	    elif(label=='wh_q' or label=='open_q' or label=='decl_q'): label = 'whq'
+		elif(label=='acknowledge' or label=='backchannel_q'): label = 'backchannel'
+		elif(label=='wh_q' or label=='open_q' or label=='decl_q'): label = 'question'
 		if(label not in idDict): 
 			idDict[label] = idNo
 			idNo += 1
@@ -29,23 +29,23 @@ def getDialAct(fileName,namespaceIdentifier,dataDir,dialActDict=None,uttDict=Non
 	if(not sideDict): sideDict = {}
 
 	for child in root:
-	    label = child.get('niteType')
-	    if(truncDAs):
-	    	if(label in truncDAs):
-	    		if(label=='yn_q' or label=='yn_decl_q' or label=='tag_q'): label = 'ynq'
-		    	elif(label=='acknowledge' or label=='backchannel_q'): label = 'backchannel'
-			    elif(label=='wh_q' or label=='open_q' or label=='decl_q'): label = 'whq'
-	    	else:
-	    		label = 'other'
-	    daId = child.get(namespaceIdentifier+'id')
-	    daIdKey = int(daId[2:])
-	    dialActDict[daIdKey] = label
-	    sideDict[daIdKey] = fileName.split('.')[1]
-	    uttDict[daIdKey] = []
-	    pointers_to_word = child.findall(namespaceIdentifier+'child')
-	    for pointer in pointers_to_word:
-	        wordId = pointer.get('href').split('#')[1][3:-1]
-	        uttDict[daIdKey].append(wordId)
+		label = child.get('niteType')
+		if(truncDAs):
+			if(label in truncDAs):
+				if(label=='yn_q' or label=='yn_decl_q' or label=='tag_q'): label = 'ynq'
+				elif(label=='acknowledge' or label=='backchannel_q'): label = 'backchannel'
+				elif(label=='wh_q' or label=='open_q' or label=='decl_q'): label = 'question'
+			else:
+				label = 'other'
+		daId = child.get(namespaceIdentifier+'id')
+		daIdKey = int(daId[2:])
+		dialActDict[daIdKey] = label
+		sideDict[daIdKey] = fileName.split('.')[1]
+		uttDict[daIdKey] = []
+		pointers_to_word = child.findall(namespaceIdentifier+'child')
+		for pointer in pointers_to_word:
+			wordId = pointer.get('href').split('#')[1][3:-1]
+			uttDict[daIdKey].append(wordId)
 
 	return dialActDict, uttDict, sideDict
 

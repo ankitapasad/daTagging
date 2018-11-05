@@ -23,14 +23,14 @@ import getDatafromXML as getDict
 import copy
 import scipy.io.wavfile as wav
 
-def updateText(convIds,utt,labels,idDict,GTfile,file):
-	for i in range(len(sortedConvIds)):
-		dataPoint = convIds[i]+','+utt[i]+'\n'
-		labelPoint = convIds[i]+','+labels[i]+','+str(idDict[labels[i]])+'\n'
+def updateText(convIds,utt,labels,idDict,GTfile,txtFile):
+	for i in range(len(convIds)):
+		dataPoint = str(i+1)+','+convIds[i]+','+utt[i]+'\n'
+		labelPoint = str(i+1)+','+convIds[i]+','+labels[i]+','+str(idDict[labels[i]])+'\n'
 		GTfile.write(labelPoint)
-		file.write(dataPoint)
+		txtFile.write(dataPoint)
 
-def updateAudio(startDir,convIds,startTimes,endTimes):
+def updateAudio(startDir,convIds,startTimes,endTimes,flag='sorted'):
 	startDir1 = "/share/data/speech/ankitap/topicID/"
 	currentWav = 'temp'
 	count = 1
@@ -42,16 +42,17 @@ def updateAudio(startDir,convIds,startTimes,endTimes):
 			(rate,sig) = wav.read(startDir1+"data/audio/all/"+f)
 			sigA = sig.T[0] # channel A
 			sigB = sig.T[1] # channel B
-			count = 1
+			if(flag=='sorted'): count = 1
 		if(sortedConvIds[i].split('_')[1]=='A'): sig = copy.deepcopy(sigA)
 		else: sig = copy.deepcopy(sigB)
 		try:
 			st = float(startTimes[i])
 			et = float(endTimes[i])
 			uttAudio = sig[int(st*rate):int(et*rate)]
-			filename = startDir+'audio/sorted/'+str(currentWav)+'/'+str(count)+'.wav'
+			if(flag=='sorted'): filename = startDir+'audio/sorted/'+str(currentWav)+'/'+str(i+1)+'.wav'
+			else: filename = startDir+'audio/shuffled/'+str(i+1)+'.wav'
 			wav.write(filename, rate, uttAudio)
-		except: pass
+		except: pass # if audios are non-aligned
 		count += 1
 
 
@@ -127,7 +128,7 @@ if __name__=="__main__":
 		updateText(sortedConvIds,sortedUtt,sortedLabels,idDict,sortedGTFile,sortedFile)
 		updateText(shuffledConvIds,shuffledUtt,shuffledLabels,idDict,shuffledGTFile,shuffledFile)
 		
-		updateAudio(startDir,sortedConvIds,sortedStartTime,sortedEndTime)
-		updateAudio(startDir,shuffledConvIds,shuffledStartTime,shuffledEndTime)
+		updateAudio(startDir,sortedConvIds,sortedStartTime,sortedEndTime,flag='sorted')
+		updateAudio(startDir,shuffledConvIds,shuffledStartTime,shuffledEndTime,flag='shuffled')
 
 		print(name[:-1])

@@ -15,9 +15,7 @@ filelist=($(python getDataHumanSubjectEval.py $noFiles $str))
 # shuf -n $noFiles dataset/daFiles/trainFiles.txt > humanSubjectEval/temp.txt
 
 ## make directories for saving the audio data
-for j in "${filelist[@]}"; do
-   mkdir -p humanSubjectEval/sample/audio/shuffled/$j
-done
+mkdir -p humanSubjectEval/sample/audio/shuffled
 
 for j in "${filelist[@]}"; do
    mkdir -p humanSubjectEval/sample/audio/sorted/$j
@@ -26,7 +24,7 @@ done
 # generate data in the respective formats
 str="gendata"
 filename=$(python getDataHumanSubjectEval.py $noFiles $str) 
-# mv humanSubjectEval/sample humanSubjectEval/$filename
+mv humanSubjectEval/sample humanSubjectEval/$filename
 
 # # rename audio data directories
 # for i in `seq 1 $noFiles`; do
